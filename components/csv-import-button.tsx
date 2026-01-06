@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useRef, useState } from "react";
 import { Form, Button, Spinner } from "react-bootstrap";
 import Papa from "papaparse";
 import { toast } from "react-toastify";
@@ -15,12 +15,12 @@ const toastSettings = {
 export default function CSVImportButton() {
   const [loading, setLoading] = useState(false);
   const router = useRouter();
+  const fileInputRef = useRef<HTMLInputElement | null>(null);
 
   const handleUpload = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
 
-    const input = e.currentTarget.elements.namedItem("csv") as HTMLInputElement;
-    const file = input.files?.[0];
+    const file = fileInputRef.current?.files?.[0];
 
     if (!file) {
       toast.error("Please select a CSV file.", toastSettings);
@@ -33,7 +33,6 @@ export default function CSVImportButton() {
       header: true,
       skipEmptyLines: true,
       complete: async (results) => {
-        console.log(results)
         try {
           const response = await fetch("/api/leads", {
             method: "POST",
@@ -47,7 +46,11 @@ export default function CSVImportButton() {
 
           toast.success(`Imported ${json.inserted} leads successfully`, toastSettings);
 
-          router.refresh(); // 👈 instant UI sync
+          if (fileInputRef.current) {
+            fileInputRef.current.value = "";
+          }
+
+          router.refresh();
         } catch (err: any) {
           toast.error(err.message || "Upload failed", toastSettings);
         } finally {
@@ -63,9 +66,14 @@ export default function CSVImportButton() {
 
   return (
     <Form onSubmit={handleUpload} className="d-flex align-items-center gap-2">
-      <Form.Control type="file" name="csv" accept=".csv" required />
-
-      <Button type="submit" disabled={loading}>
+      <Form.Control
+        type="file"
+        name="csv"
+        accept=".csv"
+        ref={fileInputRef}
+        required
+      />
+      <Button type="submit" disabled={loading} style={{ width: 100 }}>
         {loading ? <Spinner size="sm" /> : "Import"}
       </Button>
     </Form>

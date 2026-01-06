@@ -1,9 +1,7 @@
 import { EnvVarWarning } from "@/components/env-var-warning";
 import { AuthButton } from "@/components/auth-button";
-// import { ThemeSwitcher } from "@/components/theme-switcher";
 import { hasEnvVars } from "@/lib/utils";
 import { Suspense } from "react";
-import { Row, Col } from 'react-bootstrap';
 import Sidebar from "@/components/Sidebar";
 
 export default function ProtectedLayout({
@@ -14,13 +12,7 @@ export default function ProtectedLayout({
   return (
     <main className="min-h-screen flex flex-col">
       <nav className="w-full flex justify-center bg-primary h-20">
-        <div className="w-full flex justify-between items-center p-3 px-5 text-sm">
-          <div className="flex gap-5 items-center font-semibold">
-            {/* <Link href={"/dashboard"}>Next.js Supabase Starter</Link>
-              <div className="flex items-center gap-2">
-                <DeployButton />
-              </div> */}
-          </div>
+        <div className="w-full flex justify-end items-center p-3 px-5 text-sm">
           {!hasEnvVars ? (
             <EnvVarWarning />
           ) : (
@@ -39,7 +31,6 @@ export default function ProtectedLayout({
           {children}
         </div>
       </div>
-
     </main>
   );
 }

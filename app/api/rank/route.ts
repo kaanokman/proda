@@ -85,8 +85,6 @@ function rankById<T extends { id: number }>(
   const map = new Map(data.map(item => [item.id, item]));
   const used = new Set<number>();
   const result: T[] = [];
-
-  // Add ranked items first
   for (const id of ranking) {
     const item = map.get(id);
     if (item) {
@@ -94,24 +92,8 @@ function rankById<T extends { id: number }>(
       used.add(id);
     }
   }
-
-  // // Add unranked items
-  // for (const item of data) {
-  //   if (!used.has(item.id)) {
-  //     result.push(item);
-  //   }
-  // }
-
   return result;
 }
-
-function parseGeminiJSON(output: any) {
-  const match = output?.match(/```json\s*([\s\S]*?)\s*```/i);
-  if (!match) throw new Error("No JSON found in Gemini output");
-
-  return JSON.parse(match[1]);
-}
-
 
 export async function POST(req: Request) {
   try {
@@ -159,8 +141,6 @@ export async function POST(req: Request) {
         This example would represent the lead's with ids 3, 4, 8, and 2 ranked in that order.      
       `;
 
-      console.log(prompt)
-
       const ai = new GoogleGenAI({});
       const response = await ai.models.generateContent({
         model: "gemini-2.5-flash",
@@ -179,7 +159,7 @@ export async function POST(req: Request) {
           const rank = idx + 1;
           const { data, error } = await supabase
             .from("leads")
-            .update({ ...lead, rank })
+            .update({ rank })
             .eq("user_id", user.id)
             .eq("id", lead.id);
           if (error) {
@@ -194,24 +174,11 @@ export async function POST(req: Request) {
         return NextResponse.json({ error: 'No response from Gemini' }, { status: 500 });
       }
 
-
     } else {
       console.error("No lead with employee count");
       return NextResponse.json({ error: 'No lead with employee count' }, { status: 400 });
     }
 
-
-    // return NextResponse.json({ result: body }, { status: 201 });
-
-    // const { error } = await supabase
-    //   .from("leads")
-    //   .insert({ ...body, user_id: user.id });
-
-    // if (error) {
-    //   console.error("Error creating new lead", error.message);
-    //   return NextResponse.json({ error: "Error creating new lead" }, { status: 400 });
-    // }
-    // return NextResponse.json({ message: "success" }, { status: 201 });
   } catch (error: any) {
     if (error instanceof Error) {
       console.error("Error ranking leads", error.message);

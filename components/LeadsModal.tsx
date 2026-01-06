@@ -6,11 +6,6 @@ import { useForm } from "react-hook-form";
 import { useRouter } from "next/navigation";
 import { toast } from "react-toastify";
 import { Spinner } from "react-bootstrap";
-import { Row, Col } from 'react-bootstrap';
-import { FaArrowRight, FaArrowLeft } from "react-icons/fa";
-import { CiCamera } from "react-icons/ci";
-import { AiOutlineRedo } from "react-icons/ai";
-import { CiImageOn } from "react-icons/ci";
 
 type LeadsModalProps = {
   item?: {
@@ -45,53 +40,19 @@ export default function LeadsModal(props: LeadsModalProps) {
   const { register, handleSubmit, reset, formState: { errors } } =
     useForm({ defaultValues: props.item, shouldFocusError: false });
   const router = useRouter();
-  const [manual, setManual] = useState(props.item ? true : false);
   const [loading, setLoading] = useState(false);
-  const [analyzing, setAnalyzing] = useState(false);
-  const [analyzingMessage, setAnalyzingMessage] = useState('Extracting info from label...');
-  const [imageURL, setImageURL] = useState<string | null>(null);
-  const [imageFile, setImageFile] = useState<File | null>(null);
-
-  const isMobile = /Mobi|Android|iPhone|iPad/i.test(navigator.userAgent);
 
   const handleClose = () => {
     props.setShow(false);
-    setManual(false);
     reset();
-    setImageURL(null);
-    setImageFile(null);
     setLoading(false);
-    setAnalyzing(false);
-    setAnalyzingMessage('Extracting info from label...');
-  };
-
-  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (file) {
-      const url = URL.createObjectURL(file);
-      setImageURL(url);
-      setImageFile(file);
-    } else {
-      setImageURL(null);
-      setImageFile(null);
-    }
   };
 
   useEffect(() => {
     if (props.show) {
       reset(props.item);
-      setManual(props.item ? true : false);
     }
-  }, [props.show, reset, props.item])
-
-  const fileToBase64 = (file: File) => {
-    return new Promise<string>((resolve, reject) => {
-      const reader = new FileReader();
-      reader.onload = () => resolve(reader.result as string);
-      reader.onerror = reject;
-      reader.readAsDataURL(file); // e.g. data:image/png;base64,....
-    });
-  };
+  }, [props.show, reset])
 
   async function handleRequest(formData: FormDataType) {
     setLoading(true);
@@ -130,22 +91,6 @@ export default function LeadsModal(props: LeadsModalProps) {
           </Modal.Title>
         </Modal.Header>
         <Modal.Body className="d-flex flex-column gap-3 p-4 pt-3">
-          {/* < Form.Group >
-                <Form.Label className='mb-1'>Appliance Type</Form.Label>
-                <Form.Select {...register("type", { required: manual ? 'Please select an applaince type' : false })} disabled={loading}
-                  isInvalid={!!errors.type}     >
-                  <option value="">Select type...</option>
-                  <option value="refrigerator">Refrigerator</option>
-                  <option value="oven">Oven</option>
-                  <option value="dishwasher">Dishwasher</option>
-                  <option value="washer">Washer</option>
-                  <option value="dryer">Dryer</option>
-                  <option value="microwave">Microwave</option>
-                </Form.Select>
-                <Form.Control.Feedback type="invalid" className='position-absolute text-xs mt-0'>
-                  {errors.type?.message && String(errors.type.message)}
-                </Form.Control.Feedback>
-              </Form.Group> */}
           {/* Company */}
           <Form.Group>
             <Form.Label className='mb-1'>Company</Form.Label>
@@ -210,42 +155,12 @@ export default function LeadsModal(props: LeadsModalProps) {
               {...register("rank", { valueAsNumber: true })}
             />
           </Form.Group>
-          {/* Email
-          <Form.Group>
-            <Form.Label className='mb-1'>Email</Form.Label>
-            <Form.Control
-              disabled={loading}
-              type="text"
-              {...register("email", {
-                required: 'Email is required',
-                pattern: {
-                  value: /^[^\s@]+@[^\s@]+\.[^\s@]+$/,
-                  message: "Please enter a valid email"
-                }
-              })}
-              isInvalid={!!errors.email}
-            />
-            <Form.Control.Feedback type="invalid" className='position-absolute text-xs mt-0'>
-              {errors.email?.message && String(errors.email.message)}
-            </Form.Control.Feedback>
-          </Form.Group> */}
-          {/* {!props.item && !analyzing &&
-            <div className="d-flex justify-content-center text-center text-sm">
-              <Button onClick={() => setManual(!manual)}
-                className="d-flex gap-1 align-items-center border-0 underline underline-offset-4 bg-transparent text-primary font-semibold"
-              >
-                {manual && <FaArrowLeft />}
-                {manual ? 'Use photo' : 'Enter manually'}
-                {!manual && <FaArrowRight />}
-              </Button>
-            </div>
-          } */}
         </Modal.Body>
         <Modal.Footer>
-          <Button variant="secondary" onClick={handleClose} disabled={loading || analyzing} style={{ width: 80 }}>
+          <Button variant="secondary" onClick={handleClose} disabled={loading} style={{ width: 80 }}>
             Cancel
           </Button>
-          <Button variant="primary" type="submit" disabled={loading || analyzing} style={{ width: 80 }}>
+          <Button variant="primary" type="submit" disabled={loading} style={{ width: 80 }}>
             {loading ? <Spinner size='sm' /> : 'Submit'}
           </Button>
         </Modal.Footer>

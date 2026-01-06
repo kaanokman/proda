@@ -1,7 +1,5 @@
 'use client';
 
-import { redirect } from "next/navigation";
-import { createClient } from "@/lib/supabase/server";
 import { Row, Col, Button, Spinner } from "react-bootstrap";
 import Lead from "@/components/Lead";
 import { useState, useEffect, useMemo } from "react";
@@ -93,9 +91,6 @@ export default function Leads({ leadProps }: { leadProps: LeadType[] }) {
       const { message, error } = await response.json();
       if (message === 'success') {
         router.refresh();
-        // setLeads([...result].sort(
-        //   (a: LeadType, b: LeadType) => (b.rank ?? -Infinity) - (a.rank ?? -Infinity)
-        // ));
         toast.success(`Successfully ranked leads for ${selectedCompany}`, toastSettings);
       } else if (message === 'warning') {
         toast.warn(`No rankable leads for ${selectedCompany}`, toastSettings);
@@ -107,13 +102,10 @@ export default function Leads({ leadProps }: { leadProps: LeadType[] }) {
     }
   }
 
-  // await new Promise((resolve) => setTimeout(resolve, 3000)); // 3 sec delay
-
   return (
     <div className='d-flex flex-col gap-2'>
       <Row className='justify-content-between'>
         <Col>
-          {/* Employees */}
           <Form.Group>
             <Form.Label className='mb-1'>Company</Form.Label>
             <Form.Select
@@ -175,7 +167,6 @@ export default function Leads({ leadProps }: { leadProps: LeadType[] }) {
                   {title}
                 </th>
               ))}
-
               <th
                 style={{
                   borderBottom: "1px solid #dee2e6",
@@ -185,47 +176,46 @@ export default function Leads({ leadProps }: { leadProps: LeadType[] }) {
               </th>
             </tr>
           </thead>
-
           <tbody>
-            {filteredLeads.map((lead, rowIndex) => {
-              const isLastRow = rowIndex === filteredLeads.length - 1;
-              const cells = Object.entries(lead).filter(([key]) => key !== "id");
-
-              return (
-                <tr key={lead.id}>
-                  {cells.map(([key, value]) => (
-                    <td
-                      key={key}
-                      style={{
-                        borderRight: "1px solid #dee2e6",
-                        borderBottom: isLastRow ? "none" : "1px solid #dee2e6",
-                      }}
-                    >
-                      {value ? String(value) : "-"}
-                    </td>
-                  ))}
-
-                  {/* Actions column */}
-                  <td
-                    style={{
-                      borderBottom: isLastRow ? "none" : "1px solid #dee2e6",
-                    }}
-                  >
-                    <Lead item={lead} />
-                  </td>
-                </tr>
-              );
-            })}
+            {filteredLeads.length === 0 ?
+              <tr>
+                <td colSpan={columns.length + 1} className='border-bottom-0'>
+                  <div className='d-flex justify-content-center'>
+                    No leads
+                  </div>
+                </td>
+              </tr> : <>
+                {filteredLeads.map((lead, rowIndex) => {
+                  const isLastRow = rowIndex === filteredLeads.length - 1;
+                  const cells = Object.entries(lead).filter(([key]) => key !== "id");
+                  return (
+                    <tr key={lead.id} className={isLastRow ? 'border-bottom-0' : ''}>
+                      {cells.map(([key, value]) => (
+                        <td
+                          key={key}
+                          style={{
+                            borderRight: "1px solid #dee2e6",
+                            borderBottom: isLastRow ? "none" : "1px solid #dee2e6",
+                          }}
+                        >
+                          {value ? String(value) : "-"}
+                        </td>
+                      ))}
+                      <td
+                        style={{
+                          borderBottom: isLastRow ? "none" : "1px solid #dee2e6",
+                        }}
+                      >
+                        <Lead item={lead} />
+                      </td>
+                    </tr>
+                  );
+                })}
+              </>
+            }
           </tbody>
-
         </Table>
       </div>
-
-      {/* {leads.map((item) => (
-          <Col key={item.id} xs='auto'>
-            <Lead item={item} />
-          </Col>
-        ))} */}
     </div >
   );
 }
