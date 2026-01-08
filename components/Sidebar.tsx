@@ -9,7 +9,6 @@ export default function Sidebar() {
 
   const navItems = [
     { label: "Home", path: "/dashboard" },
-    // { label: "Team", path: "/dashboard/leads" },
   ];
 
   return (

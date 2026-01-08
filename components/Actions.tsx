@@ -5,7 +5,7 @@ import { Row, Col } from 'react-bootstrap';
 import { OverlayTrigger, Tooltip } from "react-bootstrap";
 import { FaEdit, FaRegTrashAlt } from "react-icons/fa";
 import { useState } from "react";
-import LeadsModal from "./RentRollModal";
+import RentRollModal from "./RentRollModal";
 import ConfirmationModal from "./confirmation-modal";
 import { toast } from "react-toastify";
 import { useRouter } from "next/navigation";
@@ -88,7 +88,7 @@ export default function Actions(props: RentRollDataProps) {
         onConfirm={() => props.item && handleDelete(props.item.id)}
         loading={loading}
       />
-      <LeadsModal show={show} setShow={setShow} item={props.item} />
+      <RentRollModal show={show} setShow={setShow} item={props.item} />
     </>
   );
 }

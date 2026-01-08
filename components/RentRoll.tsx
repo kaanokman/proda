@@ -1,10 +1,9 @@
 'use client';
 
-import { Row, Col, Button, Spinner } from "react-bootstrap";
+import { Row, Col } from "react-bootstrap";
 import Actions from "@/components/Actions";
 import { useState, useEffect, useMemo } from "react";
 import { toast } from "react-toastify";
-import { useRouter } from "next/navigation";
 import Table from 'react-bootstrap/Table';
 import { Form } from "react-bootstrap";
 
@@ -30,76 +29,49 @@ type RentRollType = {
 const columns = ["Address", "Property", "Unit", "Tenant", "Lease Start", "Lease End", "Square Feet", "Monthly Payment"];
 
 export default function RentRoll({ rentRoll }: { rentRoll: RentRollType[] }) {
-  const router = useRouter();
 
-  const [leads, setLeads] = useState<RentRollType[]>(rentRoll);
-  const [loading, setLoading] = useState(true);
+  const [rentRollData, setRentRollData] = useState<RentRollType[]>(rentRoll);
+  // const [loading, setLoading] = useState(true);
 
-  const [filteredLeads, setFilteredLeads] = useState<RentRollType[]>(rentRoll);
+  const [filteredData, setFilteredData] = useState<RentRollType[]>(rentRoll);
 
   const [selectedCompany, setSelectedCompany] = useState<string | null>(null);
 
   const organizations = useMemo(() => {
     return Array.from(
-      new Set(leads.map(l => l.property).filter(Boolean))
+      new Set(rentRollData.map(l => l.property).filter(Boolean))
     );
-  }, [leads]);
+  }, [rentRollData]);
 
-  const getleads = async () => {
+  const getRentRollData = async () => {
     const response = await fetch("/api/rent_roll", {
       method: "GET",
     });
     const { result, error } = await response.json();
     if (result) {
-      setLeads(result);
+      setRentRollData(result);
     } else if (error) {
-      toast.error(`Error loading leads`, toastSettings);
+      toast.error(`Error loading rent roll data`, toastSettings);
     }
-    setLoading(false);
+    // setLoading(false);
   }
 
   useEffect(() => {
     if (!selectedCompany) {
-      setFilteredLeads(leads);
+      setFilteredData(rentRollData);
     } else {
-      const displayLeads = leads.filter((lead) => lead.property === selectedCompany);
-      setFilteredLeads(displayLeads);
-      if (!displayLeads.length) {
+      const data = rentRollData.filter((rentRollItem) => rentRollItem.property === selectedCompany);
+      setFilteredData(data);
+      if (!data.length) {
         setSelectedCompany("");
       }
     }
-  }, [leads, selectedCompany]);
+  }, [rentRollData, selectedCompany]);
 
   useEffect(() => {
-    setLoading(true);
-    getleads();
+    // setLoading(true);
+    getRentRollData();
   }, [rentRoll]);
-
-  // const handleRanking = async () => {
-  //   setLoading(true);
-
-  //   if (!filteredLeads.some(lead => lead.employees)) {
-  //     toast.error(`Company employee count unknown`, toastSettings);
-  //     setLoading(false);
-  //   } else {
-  //     const response = await fetch("/api/rank", {
-  //       method: "POST",
-  //       headers: { "Content-Type": "application/json" },
-  //       body: JSON.stringify(filteredLeads)
-  //     });
-  //     const { message, error } = await response.json();
-  //     if (message === 'success') {
-  //       router.refresh();
-  //       toast.success(`Successfully ranked leads for ${selectedCompany}`, toastSettings);
-  //     } else if (message === 'warning') {
-  //       toast.warn(`No rankable leads for ${selectedCompany}`, toastSettings);
-  //       setLoading(false);
-  //     } else if (error) {
-  //       toast.error(`Error ranking leads`, toastSettings);
-  //       setLoading(false);
-  //     }
-  //   }
-  // }
 
   return (
     <div className='d-flex flex-col gap-2'>
@@ -120,14 +92,6 @@ export default function RentRoll({ rentRoll }: { rentRoll: RentRollType[] }) {
             </Form.Select>
           </Form.Group>
         </Col>
-        {/* <Col xs='auto' className='d-flex flex-column justify-content-end'>
-          <Button
-            style={{ width: 160 }}
-            disabled={!selectedCompany || loading}
-            onClick={() => handleRanking()}>
-            {loading ? <Spinner size='sm' /> : 'Rank Leads'}
-          </Button>
-        </Col> */}
       </Row>
       <div
         style={{
@@ -176,19 +140,19 @@ export default function RentRoll({ rentRoll }: { rentRoll: RentRollType[] }) {
             </tr>
           </thead>
           <tbody>
-            {filteredLeads.length === 0 ?
+            {filteredData.length === 0 ?
               <tr>
                 <td colSpan={columns.length + 1} className='border-bottom-0'>
                   <div className='d-flex justify-content-center'>
-                    No leads
+                    No rent roll data
                   </div>
                 </td>
               </tr> : <>
-                {filteredLeads.map((lead, rowIndex) => {
-                  const isLastRow = rowIndex === filteredLeads.length - 1;
-                  const cells = Object.entries(lead).filter(([key]) => key !== "id");
+                {filteredData.map((rentRollItem, rowIndex) => {
+                  const isLastRow = rowIndex === filteredData.length - 1;
+                  const cells = Object.entries(rentRollItem).filter(([key]) => key !== "id");
                   return (
-                    <tr key={lead.id} className={isLastRow ? 'border-bottom-0' : ''}>
+                    <tr key={rentRollItem.id} className={isLastRow ? 'border-bottom-0' : ''}>
                       {cells.map(([key, value]) => (
                         <td
                           key={key}
@@ -205,7 +169,7 @@ export default function RentRoll({ rentRoll }: { rentRoll: RentRollType[] }) {
                           borderBottom: isLastRow ? "none" : "1px solid #dee2e6",
                         }}
                       >
-                        <Actions item={lead} />
+                        <Actions item={rentRollItem} />
                       </td>
                     </tr>
                   );
