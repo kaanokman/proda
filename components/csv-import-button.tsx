@@ -23,7 +23,7 @@ export default function CSVImportButton() {
     const file = fileInputRef.current?.files?.[0];
 
     if (!file) {
-      toast.error("Please select a CSV file.", toastSettings);
+      toast.error("Please select a CSV file", toastSettings);
       return;
     }
 
@@ -58,7 +58,7 @@ export default function CSVImportButton() {
         }
       },
       error: () => {
-        toast.error("Failed to parse CSV file.", toastSettings);
+        toast.error("Failed to parse CSV file", toastSettings);
         setLoading(false);
       },
     });

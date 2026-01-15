@@ -8,21 +8,17 @@ import Table from 'react-bootstrap/Table';
 import { Form } from "react-bootstrap";
 import { PieChart } from '@mui/x-charts/PieChart';
 import { FaSort, FaSortUp, FaSortDown } from "react-icons/fa";
-import dayjs from "dayjs";
-import { Modal, Button, Dropdown } from "react-bootstrap";
+import { Modal, Button, Dropdown, Tooltip, OverlayTrigger } from "react-bootstrap";
 import {
-  useReactTable,
-  getCoreRowModel,
-  getSortedRowModel,
-  flexRender,
-  SortingState,
-  CellContext
+  useReactTable, getCoreRowModel, getSortedRowModel,
+  flexRender, SortingState, CellContext
 } from "@tanstack/react-table";
 import { PieSeriesType, PieValueType } from "@mui/x-charts";
 import { Spinner } from "react-bootstrap";
 import { FaExclamationTriangle } from "react-icons/fa";
-import type { RowType } from "@tanstack/react-table";
-
+import { RentRollType } from "@/types/components";
+import type { ColumnDef } from "@tanstack/react-table";
+import dayjs from "dayjs";
 import customParseFormat from "dayjs/plugin/customParseFormat";
 dayjs.extend(customParseFormat);
 
@@ -46,14 +42,12 @@ const asValidDate = (v: any): Date | null => {
   const s = v.trim();
   if (!s) return null;
 
-  // Strict DD-MM-YYYY
   const dmy = dayjs(s, "DD-MM-YYYY", true);
   if (dmy.isValid()) {
     const [day, month, year] = s.split("-").map(Number);
     return new Date(year, month - 1, day);
   }
 
-  // Strict YYYY-MM-DD (IMPORTANT: strict, no overflow)
   const ymd = dayjs(s, "YYYY-MM-DD", true);
   if (ymd.isValid()) {
     const [year, month, day] = s.split("-").map(Number);
@@ -62,8 +56,6 @@ const asValidDate = (v: any): Date | null => {
 
   return null;
 };
-
-
 
 function calculateOccupancyRates(
   rentData: RentRollType[],
@@ -91,10 +83,8 @@ function calculateOccupancyRates(
 
     const end = unit.lease_end ? asValidDate(unit.lease_end) : null;
 
-    // count this unit once (it has a valid start)
     validUnits++;
 
-    // If end missing/invalid or not after start, treat as 0 leased time
     const effectiveEnd = end ?? start;
     if (effectiveEnd.getTime() <= start.getTime()) {
       continue;
@@ -142,21 +132,8 @@ const toastSettings = {
   pauseOnHover: true,
 };
 
-type RentRollType = {
-  id: number;
-  address?: string;
-  property: string;
-  unit?: string;
-  tenant?: string;
-  lease_start?: string;
-  lease_end?: string;
-  sqft?: number;
-  monthly_payment?: number;
-  invalid_columns?: string[];
-};
-
 const columns = ["Property", "Unit", "Tenant", "Start", "End", "Sqft", "Rent"];
-const columnDefs = [
+const columnDefs: ColumnDef<RentRollType, any>[] = [
   {
     accessorKey: "property",
     header: "Property",
@@ -169,10 +146,9 @@ const columnDefs = [
         <div className="d-flex align-items-center gap-2">
           <span>{info.getValue() ?? "-"}</span>
           {invalid && (
-            <FaExclamationTriangle
-              title="Invalid value"
-              style={{ color: "#f0ad4e" }}
-            />
+            <OverlayTrigger overlay={<Tooltip>Invalid Value</Tooltip>}>
+              <FaExclamationTriangle style={{ color: "#f0ad4e" }} />
+            </OverlayTrigger>
           )}
         </div>
       );
@@ -190,10 +166,9 @@ const columnDefs = [
         <div className="d-flex align-items-center gap-2">
           <span>{info.getValue() ?? "-"}</span>
           {invalid && (
-            <FaExclamationTriangle
-              title="Invalid value"
-              style={{ color: "#f0ad4e" }}
-            />
+            <OverlayTrigger overlay={<Tooltip>Invalid Value</Tooltip>}>
+              <FaExclamationTriangle style={{ color: "#f0ad4e" }} />
+            </OverlayTrigger>
           )}
         </div>
       );
@@ -211,10 +186,9 @@ const columnDefs = [
         <div className="d-flex align-items-center gap-2">
           <span>{info.getValue() ?? "-"}</span>
           {invalid && (
-            <FaExclamationTriangle
-              title="Invalid value"
-              style={{ color: "#f0ad4e" }}
-            />
+            <OverlayTrigger overlay={<Tooltip>Invalid Value</Tooltip>}>
+              <FaExclamationTriangle style={{ color: "#f0ad4e" }} />
+            </OverlayTrigger>
           )}
         </div>
       );
@@ -237,7 +211,9 @@ const columnDefs = [
         <div className="d-flex align-items-center gap-2">
           <span>{row.lease_start ? displayDate(row.lease_start) : "-"}</span>
           {invalid && (
-            <FaExclamationTriangle title="Invalid value" style={{ color: "#f0ad4e" }} />
+            <OverlayTrigger overlay={<Tooltip>Invalid Value</Tooltip>}>
+              <FaExclamationTriangle style={{ color: "#f0ad4e" }} />
+            </OverlayTrigger>
           )}
         </div>
       );
@@ -260,7 +236,9 @@ const columnDefs = [
         <div className="d-flex align-items-center gap-2">
           <span>{row.lease_end ? displayDate(row.lease_end) : "-"}</span>
           {invalid && (
-            <FaExclamationTriangle title="Invalid value" style={{ color: "#f0ad4e" }} />
+            <OverlayTrigger overlay={<Tooltip>Invalid Value</Tooltip>}>
+              <FaExclamationTriangle style={{ color: "#f0ad4e" }} />
+            </OverlayTrigger>
           )}
         </div>
       );
@@ -279,10 +257,9 @@ const columnDefs = [
         <div className="d-flex align-items-center gap-2">
           <span>{info.getValue() ?? "-"}</span>
           {invalid && (
-            <FaExclamationTriangle
-              title="Invalid value"
-              style={{ color: "#f0ad4e" }}
-            />
+            <OverlayTrigger overlay={<Tooltip>Invalid Value</Tooltip>}>
+              <FaExclamationTriangle style={{ color: "#f0ad4e" }} />
+            </OverlayTrigger>
           )}
         </div>
       );
@@ -300,10 +277,9 @@ const columnDefs = [
         <div className="d-flex align-items-center gap-2">
           <span>{info.getValue() ?? "-"}</span>
           {invalid && (
-            <FaExclamationTriangle
-              title="Invalid value"
-              style={{ color: "#f0ad4e" }}
-            />
+            <OverlayTrigger overlay={<Tooltip>Invalid Value</Tooltip>}>
+              <FaExclamationTriangle style={{ color: "#f0ad4e" }} />
+            </OverlayTrigger>
           )}
         </div>
       );
@@ -347,26 +323,21 @@ export default function RentRoll({ rentRoll }: { rentRoll: RentRollType[] }) {
     }
   };
 
-
   useEffect(() => {
     const tableData = rentRollData.filter((unit) => {
       if (selectedCompany && unit.property !== selectedCompany) return false;
 
-      // No start date? keep row (so user can see the issue)
       if (!unit.lease_start) return true;
 
       const start = asValidDate(unit.lease_start);
 
-      // Invalid start? keep row (do NOT filter it out)
       if (!start) return true;
 
-      // If there's an end provided but it's invalid, keep row
       const end = unit.lease_end ? asValidDate(unit.lease_end) : null;
       if (unit.lease_end && !end) return true;
 
       const effectiveEnd = end ?? new Date();
 
-      // Normal overlap filter (only applies when dates are valid)
       return start <= tableRange.end && effectiveEnd >= tableRange.start;
     });
 
@@ -566,14 +537,13 @@ export default function RentRoll({ rentRoll }: { rentRoll: RentRollType[] }) {
                         className={(row.original.invalid_columns?.length ?? 0) > 0 ? "table-warning" : ""}
                       >
                         {row.getVisibleCells().map((cell, cellIndex) => (
-                          <td
-                            key={cell.id}
-                            style={{
-                              borderRight: "1px solid #dee2e6",
-                              borderBottom: isLastRow ? "none" : "1px solid #dee2e6",
-                            }}
-                          >
-                            {flexRender(cell.column.columnDef.cell, cell.getContext())}
+                          <td key={cell.id} style={{
+                            borderRight: "1px solid #dee2e6",
+                            borderBottom: isLastRow ? "none" : "1px solid #dee2e6",
+                          }}>
+                            <div>
+                              {flexRender(cell.column.columnDef.cell, cell.getContext())}
+                            </div>
                           </td>
                         ))}
                         <td

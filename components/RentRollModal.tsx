@@ -5,10 +5,13 @@ import { Button, Modal, Form, Spinner } from "react-bootstrap";
 import { useForm } from "react-hook-form";
 import { useRouter } from "next/navigation";
 import { toast } from "react-toastify";
+import dayjs from "dayjs";
+import customParseFormat from "dayjs/plugin/customParseFormat";
+dayjs.extend(customParseFormat);
 
 type RentRollModalProps = {
   item?: {
-    id: number;
+    id: string;
     address?: string;
     property: string;
     unit?: string;
@@ -27,8 +30,8 @@ type FormDataType = {
   property: string;
   unit?: string;
   tenant?: string;
-  lease_start?: Date;
-  lease_end?: Date;
+  lease_start?: string;
+  lease_end?: string;
   sqft?: number;
   monthly_payment?: number;
 };
@@ -39,9 +42,40 @@ const toastSettings = {
   pauseOnHover: true,
 };
 
+const toDateInputValue = (v?: string | null): string | undefined => {
+  if (!v) return undefined;
+
+  const s = v.trim();
+  if (!s) return undefined;
+
+  // if already YYYY-MM-DD
+  const ymd = dayjs(s, "YYYY-MM-DD", true);
+  if (ymd.isValid()) return ymd.format("YYYY-MM-DD");
+
+  // if stored as DD-MM-YYYY
+  const dmy = dayjs(s, "DD-MM-YYYY", true);
+  if (dmy.isValid()) return dmy.format("YYYY-MM-DD");
+
+  return undefined;
+};
+
+const fromDateInputValue = (v?: string | null): string | null => {
+  if (!v) return null;
+  const d = dayjs(v, "YYYY-MM-DD", true);
+  if (!d.isValid()) return null;
+  return d.format("DD-MM-YYYY");
+};
+
 export default function RentRollModal(props: RentRollModalProps) {
   const { register, handleSubmit, reset, formState: { errors } } =
-    useForm({ defaultValues: props.item, shouldFocusError: false });
+    useForm({
+      defaultValues: {
+        ...props.item,
+        property: props.item?.property ?? "", // required field
+        lease_start: toDateInputValue(props.item?.lease_start),
+        lease_end: toDateInputValue(props.item?.lease_end),
+      }, shouldFocusError: false
+    });
   const router = useRouter();
   const [loading, setLoading] = useState(false);
 
@@ -53,9 +87,13 @@ export default function RentRollModal(props: RentRollModalProps) {
 
   useEffect(() => {
     if (props.show) {
-      reset(props.item);
+      reset({
+        ...props.item,
+        lease_start: toDateInputValue(props.item?.lease_start),
+        lease_end: toDateInputValue(props.item?.lease_end),
+      });
     }
-  }, [props.show, reset])
+  }, [props.show, props.item, reset]);
 
   async function handleRequest(formData: FormDataType) {
     setLoading(true);
@@ -65,8 +103,8 @@ export default function RentRollModal(props: RentRollModalProps) {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           ...formData,
-          lease_start: formData.lease_start || null,
-          lease_end: formData.lease_end || null,
+          lease_start: fromDateInputValue(formData.lease_start),
+          lease_end: fromDateInputValue(formData.lease_end),
           ...(props.item ? { id: props.item.id } : {}),
         })
       });
@@ -97,14 +135,14 @@ export default function RentRollModal(props: RentRollModalProps) {
         </Modal.Header>
         <Modal.Body className="d-flex flex-column gap-3 p-4 pt-3">
           {/* Address */}
-          <Form.Group>
+          {/* <Form.Group>
             <Form.Label className='mb-1'>Address</Form.Label>
             <Form.Control
               disabled={loading}
               type="text"
               {...register("address")}
             />
-          </Form.Group>
+          </Form.Group> */}
           {/* Property */}
           <Form.Group>
             <Form.Label className='mb-1'>Property</Form.Label>

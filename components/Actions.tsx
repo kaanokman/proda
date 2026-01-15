@@ -8,19 +8,10 @@ import RentRollModal from "./RentRollModal";
 import ConfirmationModal from "./confirmation-modal";
 import { toast } from "react-toastify";
 import { useRouter } from "next/navigation";
+import { RentRollType } from "@/types/components";
 
 type RentRollDataProps = {
-  item?: {
-    id: number;
-    address?: string;
-    property: string;
-    unit?: string;
-    tenant?: string;
-    lease_start?: string;
-    lease_end?: string;
-    sqft?: number;
-    monthly_payment?: number;
-  };
+  item?: RentRollType;
 };
 
 const toastSettings = {
