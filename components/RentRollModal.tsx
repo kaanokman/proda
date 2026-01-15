@@ -1,11 +1,10 @@
 "use client";
 
 import { useState, useEffect, Dispatch, SetStateAction } from "react";
-import { Button, Modal, Form } from "react-bootstrap";
+import { Button, Modal, Form, Spinner } from "react-bootstrap";
 import { useForm } from "react-hook-form";
 import { useRouter } from "next/navigation";
 import { toast } from "react-toastify";
-import { Spinner } from "react-bootstrap";
 
 type RentRollModalProps = {
   item?: {
@@ -14,8 +13,8 @@ type RentRollModalProps = {
     property: string;
     unit?: string;
     tenant?: string;
-    lease_start?: Date;
-    lease_end?: Date;
+    lease_start?: string;
+    lease_end?: string;
     sqft?: number;
     monthly_payment?: number;
   },
@@ -97,7 +96,6 @@ export default function RentRollModal(props: RentRollModalProps) {
           </Modal.Title>
         </Modal.Header>
         <Modal.Body className="d-flex flex-column gap-3 p-4 pt-3">
-
           {/* Address */}
           <Form.Group>
             <Form.Label className='mb-1'>Address</Form.Label>
@@ -107,7 +105,6 @@ export default function RentRollModal(props: RentRollModalProps) {
               {...register("address")}
             />
           </Form.Group>
-
           {/* Property */}
           <Form.Group>
             <Form.Label className='mb-1'>Property</Form.Label>
@@ -121,7 +118,6 @@ export default function RentRollModal(props: RentRollModalProps) {
               {errors.property?.message && String(errors.property.message)}
             </Form.Control.Feedback>
           </Form.Group>
-
           {/* Unit */}
           <Form.Group>
             <Form.Label className='mb-1'>Unit</Form.Label>
@@ -131,7 +127,6 @@ export default function RentRollModal(props: RentRollModalProps) {
               {...register("unit")}
             />
           </Form.Group>
-
           {/* Tenant */}
           <Form.Group>
             <Form.Label className='mb-1'>Tenant</Form.Label>
@@ -141,7 +136,6 @@ export default function RentRollModal(props: RentRollModalProps) {
               {...register("tenant")}
             />
           </Form.Group>
-
           <div className='d-flex gap-3'>
             {/* Lease Start */}
             <Form.Group className='col'>
@@ -162,7 +156,6 @@ export default function RentRollModal(props: RentRollModalProps) {
               />
             </Form.Group>
           </div>
-
           <div className='d-flex gap-3'>
             {/* Square Feet */}
             <Form.Group>
@@ -183,7 +176,6 @@ export default function RentRollModal(props: RentRollModalProps) {
               />
             </Form.Group>
           </div>
-
         </Modal.Body>
         <Modal.Footer>
           <Button variant="secondary" onClick={handleClose} disabled={loading} style={{ width: 80 }}>
@@ -194,6 +186,6 @@ export default function RentRollModal(props: RentRollModalProps) {
           </Button>
         </Modal.Footer>
       </Form>
-    </Modal >
+    </Modal>
   );
 }

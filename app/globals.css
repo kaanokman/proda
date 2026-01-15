@@ -83,3 +83,11 @@
 .list-group-item:hover {
   background-color: #0018EA11 !important;
 }
+
+.tooltip {
+  position: fixed;
+}
+
+.table-striped > tbody > tr.table-warning {
+  --bs-table-striped-bg: #fff3cd;
+}

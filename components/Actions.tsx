@@ -1,7 +1,6 @@
 "use client"
 
 import { Button } from "react-bootstrap";
-import { Row, Col } from 'react-bootstrap';
 import { OverlayTrigger, Tooltip } from "react-bootstrap";
 import { FaEdit, FaRegTrashAlt } from "react-icons/fa";
 import { useState } from "react";
@@ -17,8 +16,8 @@ type RentRollDataProps = {
     property: string;
     unit?: string;
     tenant?: string;
-    lease_start?: Date;
-    lease_end?: Date;
+    lease_start?: string;
+    lease_end?: string;
     sqft?: number;
     monthly_payment?: number;
   };
@@ -59,28 +58,26 @@ export default function Actions(props: RentRollDataProps) {
 
   return (
     <>
-      <Row>
-        <Col xs='auto' className='d-flex gap-2'>
-          <OverlayTrigger trigger={isMobile ? [] : ['hover', 'hover']} overlay={<Tooltip>
-            Edit
-          </Tooltip>}>
-            <Button variant='outline-primary' onClick={() => setShow(true)}
-              style={{ height: 36, width: 36 }}
-              className='p-0 d-flex justify-content-center align-items-center'>
-              <FaEdit style={{ marginLeft: '2px' }} />
-            </Button>
-          </OverlayTrigger>
-          <OverlayTrigger trigger={isMobile ? [] : ['hover', 'hover']} overlay={<Tooltip>
-            Delete
-          </Tooltip>}>
-            <Button variant='outline-danger' onClick={() => setShowConfirmation(true)}
-              style={{ height: 36, width: 36 }}
-              className='p-0 d-flex justify-content-center align-items-center'>
-              <FaRegTrashAlt />
-            </Button>
-          </OverlayTrigger>
-        </Col>
-      </Row>
+      <div className='d-flex gap-2'>
+        <OverlayTrigger trigger={isMobile ? [] : ['hover', 'hover']} overlay={<Tooltip>
+          Edit
+        </Tooltip>}>
+          <Button variant='outline-primary' onClick={() => setShow(true)}
+            style={{ height: 36, width: 36 }}
+            className='p-0 d-flex justify-content-center align-items-center'>
+            <FaEdit style={{ marginLeft: '2px' }} />
+          </Button>
+        </OverlayTrigger>
+        <OverlayTrigger trigger={isMobile ? [] : ['hover', 'hover']} overlay={<Tooltip>
+          Delete
+        </Tooltip>}>
+          <Button variant='outline-danger' onClick={() => setShowConfirmation(true)}
+            style={{ height: 36, width: 36 }}
+            className='p-0 d-flex justify-content-center align-items-center'>
+            <FaRegTrashAlt />
+          </Button>
+        </OverlayTrigger>
+      </div>
       <ConfirmationModal
         show={showConfirmation}
         setShow={setShowConfirmation}

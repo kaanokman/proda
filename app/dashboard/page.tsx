@@ -7,21 +7,17 @@ import AddItem from "@/components/add-item";
 
 async function getRentRollData() {
   const supabase = await createClient();
-
   const { data: { user } } = await supabase.auth.getUser();
   if (!user) redirect("/auth/login");
-
   const { data, error } = await supabase
     .from("rent_roll")
-    .select("id, address, property, unit, tenant, lease_start, lease_end, sqft, monthly_payment")
+    .select("id, address, property, unit, tenant, lease_start, lease_end, sqft, monthly_payment, invalid_columns")
     .eq("user_id", user.id)
     .order("id", { ascending: true });
-
   if (error) {
     console.error("Error loading rent roll data:", error.message);
     return [];
   }
-
   return data ?? [];
 }
 
